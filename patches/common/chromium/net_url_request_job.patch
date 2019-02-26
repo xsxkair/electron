@@ -5,7 +5,7 @@ Subject: net_url_request_job.patch
 
 
 diff --git a/net/url_request/url_request_job.h b/net/url_request/url_request_job.h
-index f08e6e890ebc6b7f745b3dfab6415cc9bdce050f..c05a3b2ec3020dff845dbb79737a95bd17a2766f 100644
+index 2b2cd17fb13d050387878a2abb43c15f9034919f..89499b1c6af1aceec8503efe7274ebae1794de82 100644
 --- a/net/url_request/url_request_job.h
 +++ b/net/url_request/url_request_job.h
 @@ -294,6 +294,7 @@ class NET_EXPORT URLRequestJob : public base::PowerObserver {
