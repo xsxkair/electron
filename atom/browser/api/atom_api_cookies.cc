@@ -141,16 +141,6 @@ void ResolvePromiseWithCookies(util::Promise promise,
   promise.Resolve(cookie_list);
 }
 
-void ResolvePromise(util::Promise promise) {
-  promise.Resolve();
-}
-
-// Resolve |promise| in UI thread.
-void ResolvePromiseInUI(util::Promise promise) {
-  base::PostTaskWithTraits(FROM_HERE, {BrowserThread::UI},
-                           base::BindOnce(ResolvePromise, std::move(promise)));
-}
-
 // Run |callback| on UI thread.
 void RunCallbackInUI(base::OnceClosure callback) {
   base::PostTaskWithTraits(FROM_HERE, {BrowserThread::UI}, std::move(callback));
@@ -195,7 +185,9 @@ void RemoveCookieOnIO(scoped_refptr<net::URLRequestContextGetter> getter,
                       const std::string& name,
                       util::Promise promise) {
   GetCookieStore(getter)->DeleteCookieAsync(
-      url, name, base::BindOnce(ResolvePromiseInUI, std::move(promise)));
+      url, name,
+      base::BindOnce(&util::Promise::ResolvePromise<int>, std::move(promise),
+                     base::nullopt));
 }
 
 // Resolves/rejects the |promise| in UI thread.
@@ -218,8 +210,8 @@ void OnSetCookie(util::Promise promise, bool success) {
 void FlushCookieStoreOnIOThread(
     scoped_refptr<net::URLRequestContextGetter> getter,
     util::Promise promise) {
-  GetCookieStore(getter)->FlushStore(
-      base::BindOnce(ResolvePromiseInUI, std::move(promise)));
+  GetCookieStore(getter)->FlushStore(base::BindOnce(
+      &util::Promise::ResolvePromise<int>, std::move(promise), base::nullopt));
 }
 
 // Sets cookie with |details| in IO thread.
